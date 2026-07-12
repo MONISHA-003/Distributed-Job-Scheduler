@@ -26,6 +26,8 @@ import {
   Clock
 } from 'lucide-react';
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+
 // --- Interfaces ---
 interface UserProfile {
   id: string;
@@ -441,7 +443,7 @@ export default function App() {
       return;
     }
     try {
-      const healthRes = await fetch('http://localhost:8000/health');
+      const healthRes = await fetch(`${API_BASE_URL}/health`);
       if (healthRes.ok) {
         const healthData = await healthRes.json();
         setBackendHealth(healthData);
@@ -476,7 +478,7 @@ export default function App() {
   const fetchProfile = async (authToken: string) => {
     if (!isConnected) return;
     try {
-      const res = await fetch('http://localhost:8000/api/v1/auth/me', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
         headers: { 'Authorization': `Bearer ${authToken}` }
       });
       if (res.ok) {
@@ -521,7 +523,7 @@ export default function App() {
   const fetchBackendData = async () => {
     const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
     try {
-      const pRes = await fetch('http://localhost:8000/api/v1/projects/', { headers });
+      const pRes = await fetch(`${API_BASE_URL}/api/v1/projects/`, { headers });
       if (pRes.ok) {
         const pData = await pRes.json();
         setProjects(pData);
@@ -529,7 +531,7 @@ export default function App() {
       }
 
       if (selectedProjectId) {
-        const qRes = await fetch(`http://localhost:8000/api/v1/queues/projects/${selectedProjectId}/queues`, { headers });
+        const qRes = await fetch(`${API_BASE_URL}/api/v1/queues/projects/${selectedProjectId}/queues`, { headers });
         if (qRes.ok) {
           const qData = await qRes.json();
           setQueues(qData);
@@ -538,27 +540,27 @@ export default function App() {
       }
 
       if (selectedQueueId) {
-        const jRes = await fetch(`http://localhost:8000/api/v1/queues/${selectedQueueId}/jobs`, { headers });
+        const jRes = await fetch(`${API_BASE_URL}/api/v1/queues/${selectedQueueId}/jobs`, { headers });
         if (jRes.ok) {
           const jData = await jRes.json();
           setJobs(jData);
         }
       }
 
-      const wRes = await fetch('http://localhost:8000/api/v1/workers/workers', { headers });
+      const wRes = await fetch(`${API_BASE_URL}/api/v1/workers/workers`, { headers });
       if (wRes.ok) setWorkers(await wRes.json());
 
-      const aRes = await fetch('http://localhost:8000/api/v1/audit', { headers });
+      const aRes = await fetch(`${API_BASE_URL}/api/v1/audit`, { headers });
       if (aRes.ok) setAuditLogs(await aRes.json());
 
-      const nRes = await fetch('http://localhost:8000/api/v1/notifications', { headers });
+      const nRes = await fetch(`${API_BASE_URL}/api/v1/notifications`, { headers });
       if (nRes.ok) setNotifications(await nRes.json());
 
-      const sRes = await fetch('http://localhost:8000/api/v1/settings', { headers });
+      const sRes = await fetch(`${API_BASE_URL}/api/v1/settings`, { headers });
       if (sRes.ok) setSettings(await sRes.json());
 
       if (userProfile?.is_superuser) {
-        const uRes = await fetch('http://localhost:8000/api/v1/users', { headers });
+        const uRes = await fetch(`${API_BASE_URL}/api/v1/users`, { headers });
         if (uRes.ok) setUsers(await uRes.json());
       }
     } catch (err) {
@@ -586,7 +588,7 @@ export default function App() {
 
     if (authMode === 'signup') {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/auth/signup', {
+        const res = await fetch(`${API_BASE_URL}/api/v1/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -615,7 +617,7 @@ export default function App() {
         formData.append('username', authEmail);
         formData.append('password', authPassword);
 
-        const res = await fetch('http://localhost:8000/api/v1/auth/login', {
+        const res = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: formData.toString(),
@@ -718,7 +720,7 @@ export default function App() {
       // API Backend Submission
       const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/jobs/queues/${selectedQueueId}/jobs`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/jobs/queues/${selectedQueueId}/jobs`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -798,7 +800,7 @@ export default function App() {
       // API Edit
       const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/jobs/jobs/${selectedJob.id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/jobs/jobs/${selectedJob.id}`, {
           method: 'PUT',
           headers,
           body: JSON.stringify({
@@ -856,7 +858,7 @@ export default function App() {
       // API Delete
       const headers = { 'Authorization': `Bearer ${token}` };
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/jobs/jobs/${jobId}`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/jobs/jobs/${jobId}`, {
           method: 'DELETE',
           headers
         });
@@ -945,7 +947,7 @@ export default function App() {
       // API Run Now
       const headers = { 'Authorization': `Bearer ${token}` };
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/jobs/jobs/${jobId}/run`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/jobs/jobs/${jobId}/run`, {
           method: 'POST',
           headers
         });
@@ -992,7 +994,7 @@ export default function App() {
       // API Duplicate
       const headers = { 'Authorization': `Bearer ${token}` };
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/jobs/jobs/${jobId}/duplicate`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/jobs/jobs/${jobId}/duplicate`, {
           method: 'POST',
           headers
         });
@@ -1034,7 +1036,7 @@ export default function App() {
       // API Pause/Resume
       const headers = { 'Authorization': `Bearer ${token}` };
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/jobs/jobs/${jobId}/${action}`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/jobs/jobs/${jobId}/${action}`, {
           method: 'POST',
           headers
         });
@@ -1166,7 +1168,7 @@ export default function App() {
     } else {
       // API put settings
       const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
-      fetch('http://localhost:8000/api/v1/settings', {
+      fetch(`${API_BASE_URL}/api/v1/settings`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(settings)
@@ -1184,7 +1186,7 @@ export default function App() {
       setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, is_read: true } : n));
     } else {
       const headers = { 'Authorization': `Bearer ${token}` };
-      fetch(`http://localhost:8000/api/v1/notifications/${notifId}/read`, {
+      fetch(`${API_BASE_URL}/api/v1/notifications/${notifId}/read`, {
         method: 'PUT',
         headers
       }).then(() => fetchBackendData());
@@ -1202,7 +1204,7 @@ export default function App() {
       addConsoleLog(`Simulated User Role updated to ${newRole}`);
     } else {
       const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
-      fetch(`http://localhost:8000/api/v1/users/${userId}/role?role=${newRole}`, {
+      fetch(`${API_BASE_URL}/api/v1/users/${userId}/role?role=${newRole}`, {
         method: 'PUT',
         headers
       }).then(res => {
@@ -2405,7 +2407,7 @@ export default function App() {
                             addConsoleLog(`Toggled queue ${q.name} state.`);
                           } else {
                             const action = q.is_paused ? 'resume' : 'pause';
-                            fetch(`http://localhost:8000/api/v1/queues/queues/${q.id}/${action}`, {
+                            fetch(`${API_BASE_URL}/api/v1/queues/queues/${q.id}/${action}`, {
                               method: 'POST',
                               headers: { 'Authorization': `Bearer ${token}` }
                             }).then(() => fetchBackendData());
