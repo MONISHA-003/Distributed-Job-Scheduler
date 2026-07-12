@@ -13,12 +13,17 @@ from sqlalchemy.orm import declarative_base
 
 from app.config import settings
 
+connect_args = {}
+if "render.com" in settings.DATABASE_URL or "supabase" in settings.DATABASE_URL:
+    connect_args["ssl"] = True
+
 engine = create_async_engine(
     settings.DATABASE_URL,
     pool_size=settings.DB_POOL_SIZE,
     max_overflow=settings.DB_MAX_OVERFLOW,
     pool_pre_ping=True,
     echo=False,
+    connect_args=connect_args,
 )
 
 AsyncSessionLocal = async_sessionmaker(

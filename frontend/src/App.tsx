@@ -457,8 +457,8 @@ export default function App() {
   useEffect(() => {
     if (token) {
       fetchProfile(token);
-    } else {
-      // Seed default user in simulated mode
+    } else if (!isConnected) {
+      // Seed default user in simulated mode only if API is offline
       setUserProfile({
         id: 'u-1',
         email: 'admin@example.com',
@@ -467,6 +467,9 @@ export default function App() {
         is_superuser: true,
         role: 'admin'
       });
+    } else {
+      // Clear profile so login screen is rendered when API is online
+      setUserProfile(null);
     }
   }, [token, isConnected]);
 
