@@ -22,5 +22,6 @@ COPY . .
 # Expose FastAPI port
 EXPOSE 8000
 
-# Command to run uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Make start.sh executable and run both server and worker
+RUN chmod +x start.sh
+CMD ["./start.sh"]
